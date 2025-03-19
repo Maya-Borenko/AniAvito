@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuFrie</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo_name">
+            <a href="{% url 'home' %}" class="logo">
+                <div>
+                    <i class="fas fa-paw"></i>BuFrie
+                </div>
+                <p class="slogan">Найди себе друга!</p>
+            </a>
+        </div>
+       
+        <nav class="nav1">
+            <ul>
+                <li><a href="#">Объявления</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="#">Чаты</a></li>
+                    <li><a href="#" style="color: #a2a2a2;">Разместить объявление</a></li>
+                {% else %}
+                    <li><a href="#" onclick="alert('Для того чтобы перейти в «Чаты» необходимо авторизоваться!'); return false;">Чаты</a></li>
+                    <li><a href="#" onclick="alert('Для того чтобы перейти в «Мои участия» необходимо авторизоваться!'); return false;">Мои участия</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <nav class="nav2">
+            <ul>
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="#">
+                            <i class="fa-regular fa-user"></i> Личный кабинет
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa-regular fa-heart"></i> Избранное 
+                        </a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-lock"></i> Вход и регистрация 
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="carousel">
+            <h2>Лапки, ушки и много любви!</h2>
+            <div class="carousel-container">
+                <div class="carousel-item" style="background-color: #FF6347;">
+                    <div class="carousel-img-container">
+                        <img src="{% static 'img/cat.png' %}" alt="Кошка" class="carousel-img">
+                    </div>
+                </div>
+                <div class="carousel-item" style="background-color: #32CD32;">
+                    <div class="carousel-img-container">
+                        <img src="images/dog.png" alt="Собака" class="carousel-img">
+                    </div>
+                </div>
+                <div class="carousel-item" style="background-color: #1E90FF;">
+                    <div class="carousel-img-container">
+                        <img src="images/raccoon.png" alt="Енот" class="carousel-img">
+                    </div>
+                </div>
+                <div class="carousel-item" style="background-color: #FFD700;">
+                    <div class="carousel-img-container">
+                        <img src="images/horse.png" alt="Лошадь" class="carousel-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="about-site">
+            <h2>О нашей платформе</h2>
+            <p><b style="color: #FFAE00">BuFrie</b> — это платформа для поиска и знакомства с животными, которые могут стать вашими верными друзьями. Мы предоставляем удобный интерфейс для общения с владельцами животных, поиска лучших питомцев и участия в различных мероприятиях, связанных с животными. Наша цель — помочь вам найти лучшего друга, который будет радовать вас каждый день.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BuFrie. Все права защищены.</p>
+    </footer>
+</body>
+</html>

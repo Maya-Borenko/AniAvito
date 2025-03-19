@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'avitoForAnimals',
+    'AniAvito',
 ]
 
 MIDDLEWARE = [
@@ -78,13 +78,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'AniAvito',
-        'USER': 'user',
-        'PASSWORD': 'password',
+        'USER': 'root',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
-AUTH_USER_MODEL = 'avitoForAnimals_project.User'
+
+AUTH_USER_MODEL = 'AniAvito.User'
+
 
 
 # Password validation
