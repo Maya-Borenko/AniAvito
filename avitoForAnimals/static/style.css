@@ -93,6 +93,13 @@ body {
     color: #000000;
 }
 
+h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
 /*Хэдер*/
 header {
     position: fixed;
@@ -293,8 +300,10 @@ main {
 }
 
 .about-site h2 {
-    font-size: 36px;
+    font-family: 'Blackberry', sans-serif;
+    font-size: 64px;
     color: #FF7A00;
+    margin: 0;
     margin-bottom: 20px;
 }
 
@@ -352,3 +361,176 @@ footer {
     justify-content: center;
 
 }
+
+/*Личный кабинет*/
+.cabinet_info {
+    padding: 20px;
+}
+
+.profile-image {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-right: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info h2 {
+    margin: 0;
+}
+
+.edit-icon {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    bottom: 0;
+    right: 0;
+    background-color: #a2a2a2;
+    padding: 3px;      
+    border-radius: 50%;
+    cursor: pointer; 
+}
+
+.edit-icon i {
+    font-size: 1em;  /* Adjust the size of the icon as needed */
+    color: #FFFFFF;       /* Set the color */
+  }
+  
+/*Аутентификация*/
+.hidden {
+    display: none;
+}
+
+.auth-box{
+    margin: 50px 40px 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+}
+
+.auth-tabs {
+    width: 40%;
+    display: flex;
+    gap: 20px;
+    text-align: center;
+}
+
+.auth_btn {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    font-size: 24px;
+    transition: all 0.3s ease-in;
+    background-color: #ffffff;
+    color: #FFAE00;
+    height: 80px;
+    width: 100%;
+    border-radius: 70px;
+    border: 3px solid #FFAE00;
+    margin: 0 auto;
+    overflow: hidden; 
+    z-index: 1; 
+}
+
+.auth_btn:hover {
+    background-color: #FFAE00;
+    color: #ffffff;
+}
+
+.auth_btn.active {
+    background-color: #FFAE00; 
+    color: white;
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 30px;
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h2 {
+    text-align: center;
+    font-size: 28px;
+    color: #FF7A00;
+    margin-bottom: 20px;
+}
+
+.auth-form{
+    background-color: #fff;
+    width: 30%;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form p {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 10px 0;
+}
+
+form input {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+form input:focus {
+    border-color: #FF7A00;
+    outline: none;
+}
+
+button[type="submit"] {
+    background-color: #FF9939;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease-in;
+
+    display: inline-block;
+    position: relative;
+    height: 60px;
+    width: 80%;
+    border-radius: 70px;
+    border: 3px solid #ffffff;
+    margin: 0 auto;
+    overflow: hidden; 
+    z-index: 1; 
+}
+
+button[type="submit"]:hover {
+    background-color: #d17722;
+}
+
+.register_link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register_link a {
+    color: #FF9939;
+    text-decoration: none;
+}
+

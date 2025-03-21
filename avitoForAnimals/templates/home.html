@@ -26,7 +26,7 @@
                 {% if user.is_authenticated %}
                     <li><a href="#" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
                 {% else %}
-                    <li><a href="#" onclick="alert('Для того чтобы перейти в «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i>Разместить объявление </a></li>
+                    <li><a href="#" style="color: #a2a2a2;" onclick="alert('Для того чтобы «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i> Разместить объявление </a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -35,7 +35,7 @@
             <ul>
                 {% if user.is_authenticated %}
                     <li>
-                        <a href="#">
+                        <a href="{% url 'cabinet' %}">
                             <i class="fa-regular fa-user"></i> Личный кабинет
                         </a>
                     </li>
@@ -52,7 +52,7 @@
 
                 {% else %}
                     <li>
-                        <a href="#">
+                        <a href="{% url 'auth' %}">
                             <i class="fa-solid fa-lock"></i> Вход и регистрация 
                         </a>
                     </li>
@@ -91,13 +91,14 @@
                     </div>
                 </div>
             </div>
-            <button class="show_catalog_btn" onclick="location.href = 'catalog.html'">Смотреть объявления</button>
+            <button class="show_catalog_btn" onclick="location.href = '#'">Смотреть объявления</button>
         </section>
-        
+
         <section class="about-site">
             <h2>О нашей платформе</h2>
             <p><b style="color: #FFAE00">BuFrie</b> — это платформа для поиска и знакомства с животными, которые могут стать вашими верными друзьями. Мы предоставляем удобный интерфейс для общения с владельцами животных, поиска лучших питомцев и участия в различных мероприятиях, связанных с животными. Наша цель — помочь вам найти лучшего друга, который будет радовать вас каждый день.</p>
         </section>
+        
     </main>
 
     <footer>
