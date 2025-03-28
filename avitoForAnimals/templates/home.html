@@ -22,7 +22,7 @@
        
         <nav class="nav1">
             <ul>
-                <li><a href="#">Объявления</a></li>
+                <li><a href="{% url 'posts' %}">Объявления</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="#" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
                 {% else %}
@@ -94,7 +94,7 @@
             <button class="show_catalog_btn" onclick="location.href = '#'">Смотреть объявления</button>
         </section>
 
-        <section class="about-site">
+        <section class="long-horizontal">
             <h2>О нашей платформе</h2>
             <p><b style="color: #FFAE00">BuFrie</b> — это платформа для поиска и знакомства с животными, которые могут стать вашими верными друзьями. Мы предоставляем удобный интерфейс для общения с владельцами животных, поиска лучших питомцев и участия в различных мероприятиях, связанных с животными. Наша цель — помочь вам найти лучшего друга, который будет радовать вас каждый день.</p>
         </section>

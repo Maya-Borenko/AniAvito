@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Объявления | BuFrie</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo_name">
+            <a href="{% url 'home' %}" class="logo">
+                <div>
+                    <i class="fas fa-paw"></i>BuFrie
+                </div>
+                <p class="slogan">Найди себе друга!</p>
+            </a>
+        </div>
+       
+        <nav class="nav1">
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="#" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
+                {% else %}
+                    <li><a href="#" style="color: #a2a2a2;" onclick="alert('Для того чтобы «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i> Разместить объявление </a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <nav class="nav2">
+            <ul>
+                <li>
+                    <a href="{% url 'home' %}" style="color: #a2a2a2;">
+                        <i class="fa-solid fa-arrow-left"></i> Вернуться
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'cabinet' %}">
+                            <i class="fa-regular fa-user"></i> Личный кабинет
+                        </a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'auth' %}">
+                            <i class="fa-solid fa-lock"></i> Вход и регистрация 
+                        </a>
+                    </li>
+                {% endif %}
+                <li>
+                    <a href="#">
+                        <i class="fa-regular fa-heart"></i> Избранное 
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-envelope"></i> Чаты
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Объявления</h2>
+
+        <section class="search-filter">
+            <form method="GET" class="search" action="{% url 'posts' %}">
+                <input type="text" name="search" placeholder="Поиск по названию..." value="{{ request.GET.search }}">
+                <select name="type">
+                    <option value="">Все типы</option>
+                    <option value="Тип 1" {% if request.GET.type == 'Тип 1' %}selected{% endif %}>Тип 1</option>
+                    <option value="Тип 2" {% if request.GET.type == 'Тип 2' %}selected{% endif %}>Тип 2</option>
+                </select>
+                <button type="submit">Найти</button>
+            </form>
+        </section>
+
+        <section class="posts-grid">
+            {% for post in posts %}
+                <div class="post-card">
+                    <h3>{{ post.name }}</h3>
+                    <p><strong>Тип:</strong> {{ post.type }}</p>
+                    {% if post.file %}
+                        <p><a href="{{ post.file.url }}" target="_blank">Скачать файл</a></p>
+                    {% endif %}
+                    <p><strong>Дата публикации:</strong> {{ post.date }}</p>
+                </div>
+            {% empty %}
+                <p>Нет объявлений...</p>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BuFrie. Все права защищены.</p>
+    </footer>
+</body>
+</html>

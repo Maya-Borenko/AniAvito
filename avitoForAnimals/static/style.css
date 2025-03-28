@@ -203,6 +203,7 @@ header nav ul li a:hover {
 
 /*Наполнение страницы*/
 main {
+    height: 100vh;
     padding-top: 88px;
     padding-bottom: 40px;
     display: flex;
@@ -228,9 +229,14 @@ main {
     padding: 20px 0;
     display: flex;
     justify-content: center;
+    text-align: center;
     gap: 20px;
     overflow: hidden;
-    margin-bottom: 40px;
+    border-radius: 10px;
+}
+
+.carousel-container.flip {
+    justify-content: start;
 }
 
 /* Стиль для каждого элемента карусели */
@@ -280,6 +286,7 @@ main {
     border-radius: 70px;
     border: 3px solid #FFAE00;
     margin: 0 auto;
+    margin-top: 40px;
     overflow: hidden; 
     z-index: 1; 
 }
@@ -291,7 +298,7 @@ main {
   
 
 /* Стиль для секции о сайте */
-.about-site {
+.long-horizontal {
     background-color: #fff;
     padding: 30px;
     border-radius: 10px;
@@ -299,7 +306,12 @@ main {
     text-align: center;
 }
 
-.about-site h2 {
+.long-horizontal.rewiev {
+    background-color:  #ffffff00;
+    box-shadow: none;
+}
+
+.long-horizontal h2 {
     font-family: 'Blackberry', sans-serif;
     font-size: 64px;
     color: #FF7A00;
@@ -307,7 +319,7 @@ main {
     margin-bottom: 20px;
 }
 
-.about-site p {
+.long-horizontal p {
     font-size: 18px;
     line-height: 1.6;
     max-width: 800px;
@@ -359,7 +371,6 @@ footer {
     align-items: center;
     text-align: center;
     justify-content: center;
-
 }
 
 /*Личный кабинет*/
@@ -368,7 +379,6 @@ footer {
 }
 
 .profile-image {
-    position: relative;
     width: 200px;
     height: 200px;
     border-radius: 50%;
@@ -376,10 +386,21 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+.img-border {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
 .profile-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.profile-info {
+    position: relative;
 }
 
 .profile-info h2 {
@@ -390,8 +411,8 @@ footer {
     position: absolute;
     width: 20px;
     height: 20px;
-    bottom: 0;
-    right: 0;
+    top: -10px;
+    right: -40px;
     background-color: #a2a2a2;
     padding: 3px;      
     border-radius: 50%;
@@ -402,6 +423,33 @@ footer {
     font-size: 1em;  /* Adjust the size of the icon as needed */
     color: #FFFFFF;       /* Set the color */
   }
+
+.horizontal.logout{
+    padding-top: 10px;
+    padding-right: 10px;
+    justify-content: end;
+}
+
+.logout-btn {
+    top: 20px;
+    right: 20px;
+    background-color: #ff4d4d; /* Красный цвет кнопки */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    text-decoration: none;
+}
+
+.logout-btn:hover {
+    background-color: #d93636; /* Темнее при наведении */
+    transform: scale(1.05); /* Легкое увеличение */
+}
+
   
 /*Аутентификация*/
 .hidden {
@@ -502,6 +550,7 @@ form input:focus {
 }
 
 button[type="submit"] {
+    margin-top: 20px !important;
     background-color: #FF9939;
     color: white;
     padding: 15px;
@@ -534,3 +583,121 @@ button[type="submit"]:hover {
     text-decoration: none;
 }
 
+/*Карусель вариантов*/
+.horizontal.post-carousel {
+    display: flex;
+    align-items: center;
+    position: relative;
+    justify-content: space-between;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.card {
+    flex: 0 0 auto;
+    width: 200px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 20px;
+}
+
+.carousel-btn {
+    background: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 20px;
+}
+
+.prev { margin-right: 10px; }
+.next { margin-left: 10px; }
+
+/*Модальное окно*/
+.modal {
+    display: none; /* Модальное окно скрыто по умолчанию */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Затемнение фона */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+    position: relative;
+    max-height: 80vh;  /* Максимальная высота модального окна (80% от высоты экрана) */
+    overflow-y: auto;  /* Включаем вертикальную прокрутку */
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/*Объявления*/
+.posts-grid {
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.post-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+
+.search-filter {
+    padding: 0 20px;
+}
+
+form.search {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-direction: row;
+}
+
+form.search input,
+form.search select,
+form.search button {
+    padding: 10px;
+    font-size: 16px;
+    margin-right: 10px;
+    border-radius: 30px;
+}
+
+form.search button {
+    margin-top: 0 !important;
+    max-width: 200px;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #45a049;
+}
