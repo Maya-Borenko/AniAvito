@@ -23,7 +23,7 @@
             <ul>
                 <li><a href="{% url 'posts' %}">Объявления</a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="#" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
+                    <li><a href="{% url 'create_post' %}" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
                 {% else %}
                     <li><a href="#" style="color: #a2a2a2;" onclick="alert('Для того чтобы перейти в «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i> Разместить объявление </a></li>
                 {% endif %}

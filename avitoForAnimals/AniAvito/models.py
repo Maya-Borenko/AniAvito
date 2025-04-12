@@ -61,12 +61,23 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # Модель поста
 class Post(models.Model):
+    ANIMAL_CHOICES = [
+        ('Собака', 'Собака'),
+        ('Кошка', 'Кошка'),
+        ('Птица', 'Птица'),
+        ('Грызун', 'Грызун'),
+        ('Другое', 'Другое'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     name = models.CharField("Название", max_length=20)
     type = models.CharField("Тип", max_length=200)
-    file = models.FileField(upload_to="Document/", null=True, blank=True, verbose_name="Файл")
+    description = models.TextField("Описание объявления", max_length=1000, blank=True, null=True)
+    photo = models.FileField(upload_to="Animals_image/", null=True, blank=True, verbose_name="Фото объявления")
+    file = models.FileField(upload_to="Document/", null=True, blank=True, verbose_name="Ветеринарный паспорт")
     date = models.DateTimeField("Время публикации", auto_now_add=True)
     status = models.BooleanField("Открыто", default=True)
+
+    is_favorite = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Пост"
@@ -87,6 +98,7 @@ class Review(models.Model):
 class Chat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name="Пост")
+    deal_completed_with = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='completed_deals')
 
     class Meta:
         verbose_name = "Чат"
@@ -102,3 +114,11 @@ class Message(models.Model):
     class Meta:
         verbose_name = "Сообщение"
         verbose_name_plural = "Сообщения"
+
+# Модель избранного
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = ('user', 'post')

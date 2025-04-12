@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Объявления | BuFrie</title>
+    <title>Избранное | BuFrie</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
@@ -44,16 +44,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'favorites' %}">
-                            <i class="fa-regular fa-heart"></i> Избранное 
-                        </a>
-                    </li>
-                    <li>
                         <a href="{% url 'all_chats' %}">
                             <i class="fas fa-envelope"></i> Чаты
                         </a>
                     </li>
-
                 {% else %}
                     <li>
                         <a href="{% url 'auth' %}">
@@ -66,55 +60,30 @@
     </header>
 
     <main>
-        <h2>Объявления</h2>
+        <h2>Избранные объявления</h2>
 
-        <section class="search-filter">
-            <form method="GET" class="search" action="{% url 'posts' %}">
-                <input type="text" name="search" placeholder="Поиск по названию..." value="{{ request.GET.search }}">
-                <select name="type">
-                    <option value="">Все типы</option>
-                    {% for post_type in post_types %}
-                        <option value="{{ post_type }}" {% if request.GET.type == post_type %}selected{% endif %}>{{ post_type }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Найти</button>
-            </form>
-        </section>
-       
         <section class="posts-grid">
-            {% for post in posts %}
-                <div class="post-card">
-                    <h3>{{ post.name }}</h3>
-                    <p><strong>Тип:</strong> {{ post.type }}</p>
-                    <img src="{% if post.photo %}{{ post.photo.url }}{% else %}{% static 'img/default-post.png' %}{% endif %}" alt="Фото объявления">
-                    {% if user.is_authenticated and post.user != user %}
+            {% if favorite_posts %}
+                {% for post in favorite_posts %}
+                    <div class="post-card" id="post-{{ post.id }}">
+                        <h3>{{ post.name }}</h3>
+                        <p><strong>Тип:</strong> {{ post.type }}</p>
+                        <img src="{% if post.photo %}{{ post.photo.url }}{% else %}{% static 'img/default-post.png' %}{% endif %}" alt="Фото объявления">
                         <div class="favorite-icon" onclick="toggleFavorite(event, {{ post.id }})">
-                            <i class="fa-heart {% if post.is_favorite %}fas{% else %}far{% endif %}"></i>
+                            <i class="fa-solid fa-xmark"></i>
                         </div>
-                    {% endif %}
-                    {% if post.description %}
-                        <p><strong>Описание:</strong> {{ post.description }}</p>
-                    {% endif %}
-                    {% if post.file %}
-                        <p><a href="{{ post.file.url }}" target="_blank">Скачать файл</a></p>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                        <p><strong>Автор:</strong> <a href="{% url 'user_cabinet' user_id=post.user.id %}">{{ post.user.first_name}} {{ post.user.last_name}}</a></p>
-                    {% else %}
-                        <p style="color: #ff7a00;"><strong>Авторизуйтесь</strong>, чтобы связаться с владельцем и добавлять карточки в избранное!</p>
-                    {% endif %}
-                    <p><strong>Дата публикации:</strong> {{ post.date }}</p>
-                    {% if user.is_authenticated and post.user != user %}
-                        {% if chat %}
-                            <a href="{% url 'chat_view' chat_id=chat.id %}" class="go_to_chat">Перейти в чат</a>
-                        {% else %}
-                            <a href="{% url 'create_or_get_chat' post_id=post.id user_id=user.id %}" class="go_to_chat">Перейти в чат</a>
+                        {% if post.description %}
+                            <p><strong>Описание:</strong> {{ post.description }}</p>
                         {% endif %}
-                    {% endif %}
-                </div>
-            {% empty %}
-                <p>Нет объявлений...</p>
-            {% endfor %}
+                        {% if post.file %}
+                            <p><a href="{{ post.file.url }}" target="_blank">Скачать файл</a></p>
+                        {% endif %}
+                        <p><strong>Дата публикации:</strong> {{ post.date }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>У вас нет избранных объявлений.</p>
+            {% endif %}
         </section>
     </main>
 
@@ -125,11 +94,11 @@
     <script>
         function toggleFavorite(event, postId) {
             var heartIcon = event.target;
-    
+
             // Переключение класса для анимации
             heartIcon.classList.toggle('fas');
             heartIcon.classList.toggle('far');
-    
+
             // AJAX-запрос для обновления избранного в базе данных
             fetch(`/toggle_favorite/${postId}/`, {
                 method: 'POST',
@@ -144,9 +113,15 @@
                     heartIcon.classList.toggle('fas');
                     heartIcon.classList.toggle('far');
                 } else {
-                    // Обновляем состояние избранного
-                    heartIcon.classList.toggle('fas', data.is_favorite);
-                    heartIcon.classList.toggle('far', !data.is_favorite);
+                    // Если пост удален из избранного, удаляем его с экрана
+                    if (!data.is_favorite) {
+                        var postCard = document.getElementById('post-' + postId);
+                        postCard.remove();
+                    } else {
+                        // Обновляем состояние избранного
+                        heartIcon.classList.toggle('fas', data.is_favorite);
+                        heartIcon.classList.toggle('far', !data.is_favorite);
+                    }
                 }
             });
         }
@@ -166,7 +141,6 @@
             }
             return cookieValue;
         }
-    </script>
-    
+    </script>    
 </body>
 </html>
