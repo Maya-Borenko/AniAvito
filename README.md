@@ -38,7 +38,7 @@ BuFrie - это веб-платформа на Django для покупки и �
 
 1. Клонировать репозиторий:
 ```bash
-git clone
+git clone https://github.com/Maya-Borenko/AniAvito.git
 cd avitoForAnimals
 ```
 
