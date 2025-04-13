@@ -1,0 +1,411 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЛК | BuFrie</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo_name">
+            <a href="{% url 'home' %}" class="logo">
+                <div>
+                    <i class="fas fa-paw"></i>BuFrie
+                </div>
+                <p class="slogan">Найди себе друга!</p>
+            </a>
+        </div>
+       
+        <nav class="nav1">
+            <ul>
+                <li><a href="{% url 'posts' %}">Объявления</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'create_post' %}" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
+                {% else %}
+                    <li><a href="#" style="color: #a2a2a2;" onclick="alert('Для того чтобы «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i> Разместить объявление </a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <nav class="nav2">
+            <ul>
+                <li>
+                    <a href="{% url 'home' %}" style="color: #a2a2a2;">
+                        <i class="fa-solid fa-arrow-left"></i> На домашнюю страницу
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'favorites' %}">
+                        <i class="fa-regular fa-heart"></i> Избранное 
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'all_chats' %}">
+                        <i class="fas fa-envelope"></i> Чаты
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% if is_owner %}
+            <div class="horizontal logout">
+                <a href="{% url 'logout' %}" class="logout-btn">Выйти</a>
+            </div>
+        {% endif %}
+        <div class="horizontal cabinet_info">
+            <div class="profile-image">
+                <div class="img-border">
+                    {% if profile_user.user_image %}
+                        <img src="{{ profile_user.user_image.url }}" alt="Фото профиля">
+                    {% else %}
+                        <img src="{% static 'img/default-profile.png' %}" alt="Фото профиля по умолчанию">
+                    {% endif %}
+                </div>
+            </div>
+        
+            <div class="profile-info">
+                <h2>{{ profile_user.first_name }} {{ profile_user.last_name }}</h2>
+                <p>Email: {{ profile_user.email }}</p>
+                {% if is_owner %}
+                    <div class="edit-icon">
+                        <i class="fa-solid fa-pencil"></i>
+                        <input type="file" id="profile-image-input" name="user_image" style="display:none;">
+                        <label for="profile-image-input"></label>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <section class="long-horizontal">
+            <h2>Объявления</h2>
+            <div class="horizontal post-carousel">
+                <button class="carousel-btn prev">&#10094;</button>
+                <div class="carousel-container flip">
+                    <div class="carousel-track">
+                        {% for post in posts %}
+                            <div class="post-card">
+                                <h3>{{ post.name }}</h3>
+                                <p><strong>Тип:</strong> {{ post.type }}</p>
+                                <img src="{% if post.photo %}{{ post.photo.url }}{% else %}{% static 'img/default-post.png' %}{% endif %}" alt="Фото объявления">
+                                {% if is_owner %}
+                                <div class="favorite-icon" 
+                                    data-post-id="{{ post.id }}" 
+                                    data-post-name="{{ post.name }}" 
+                                    data-post-description="{{ post.description|default_if_none:'' }}" 
+                                    data-post-type="{{ post.type }}"
+                                    onclick="openEditModal(this)">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </div>
+                                <button class="delete-btn" data-id="{{ post.id }}" onclick="deletePost(this)">Удалить объявление</button>        
+                                {% endif %}
+                                {% if post.description %}
+                                    <p><strong>Описание:</strong> {{ post.description }}</p>
+                                {% endif %}
+                                {% if post.file %}
+                                    <p><a href="{{ post.file.url }}" target="_blank">Скачать файл</a></p>
+                                {% endif %}
+                                <p><strong>Дата публикации:</strong> {{ post.date }}</p>
+                                {% if user.is_authenticated and post.user != user and post.status == True%}
+                                    {% if chat %}
+                                        <a href="{% url 'chat_view' chat_id=chat.id %}" class="go_to_chat">Перейти в чат</a>
+                                    {% else %}
+                                        <a href="{% url 'create_or_get_chat' post_id=post.id user_id=user.id %}" class="go_to_chat">Перейти в чат</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p>У этого пользователя нет объявлений.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="carousel-btn next">&#10095;</button>
+            </div>
+        </section>
+
+        <section class="long-horizontal rewiev">
+            <h2>Отзывы</h2>
+            <div class="horizontal post-carousel">
+                <button class="carousel-btn prev pr2">&#10094;</button>
+                <div class="carousel-container flip carco2">
+                    <div class="carousel-track ct2">
+                        {% for review in reviews %}
+                            <div class="lk card c2">
+                                <div class="lk review-header">
+                                    <div class="lk review-avatar">
+                                        {% if review.user.user_image %}
+                                            <img src="{{ review.user.user_image.url }}" alt="Фото пользователя">
+                                        {% else %}
+                                            <img src="{% static 'img/default-profile.png' %}" alt="Фото пользователя">
+                                        {% endif %}
+                                    </div>
+                                    <div class="lk review-info">
+                                        <p class="lk review-name">{{ review.user.first_name }} {{ review.user.last_name }}</p>
+                                        <p class="lk review-post-name">{{ review.post.name }}</p>
+                                    </div>
+                                </div>
+                                <p class="lk review-text">{{ review.review_text }}</p>
+                                <p class="lk review-date">{{ review.review_time|date:"d.m.Y H:i" }}</p>
+                            </div>
+                        {% empty %}
+                            <p>Отзывов нет.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="carousel-btn next nx2">&#10095;</button>
+            </div>
+        </section>
+        
+        {% if is_owner %}
+            <div id="profile-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Редактировать профиль</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label for="{{ form.first_name.id_for_label }}">Имя:</label>
+                        <p>{{ form.first_name }}</p>
+                        <label for="{{ form.last_name.id_for_label }}">Фамилия:</label>
+                        <p>{{ form.last_name }}</p>
+                        <label for="{{ form.user_image.id_for_label }}">Фото профиля:</label>
+                        <input type="file" name="user_image" id="{{ form.user_image.id_for_label }}">
+                        
+                        <button type="submit" name="profile_form">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="post-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Редактировать объявление</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ post_form.as_p }}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <button type="submit" name="post_form">Сохранить</button>
+                        {% if post %}
+                            <p>Post ID: {{ post.id }}</p>
+                        {% else %}
+                            <p>Ошибка: данные не найдены.</p>
+                        {% endif %}
+                    </form>       
+                </div>
+            </div>            
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BuFrie. Все права защищены.</p>
+    </footer>
+
+    <script>
+        const track = document.querySelector('.carousel-track');
+        const cards = document.querySelectorAll('.post-card');
+        const prev = document.querySelector('.prev');
+        const next = document.querySelector('.next');
+        let index = 0;
+        let cardWidth = cards[0].offsetWidth;
+        let visibleCount = Math.floor(document.querySelector('.carousel-container').offsetWidth / cardWidth);
+
+        function updateCarousel() {
+            track.style.transform = `translateX(${-index * cardWidth}px)`;
+        }
+
+        function updateVisibleCount() {
+            cardWidth = cards[0].offsetWidth;
+            visibleCount = Math.floor(document.querySelector('.carousel-container').offsetWidth / cardWidth);
+            updateCarousel();
+        }
+
+        next.addEventListener('click', () => {
+            if (index + visibleCount < cards.length) {
+                index++;
+            }
+            updateCarousel();
+        });
+
+        prev.addEventListener('click', () => {
+            if (index > 0) {
+                index--;
+            }
+            updateCarousel();
+        });
+
+        window.addEventListener('resize', updateVisibleCount);
+    </script>
+
+
+    <script>
+        const track2 = document.querySelector('.ct2');
+        const cards2 = document.querySelectorAll('.c2');
+        const prev2 = document.querySelector('.pr2');
+        const next2 = document.querySelector('.nx2');
+        let index2 = 0;
+        let cardWidth2 = cards2[0].offsetWidth;
+        let visibleCount2 = Math.floor(document.querySelector('.carco2').offsetWidth / cardWidth2);
+
+        function updateCarousel2() {
+            track2.style.transform = `translateX(${-index2 * cardWidth2}px)`;
+        }
+
+        function updateVisibleCount2() {
+            cardWidth2 = cards2[0].offsetWidth;
+            visibleCount2 = Math.floor(document.querySelector('.carco2').offsetWidth / cardWidth2);
+            updateCarousel2();
+        }
+
+        next2.addEventListener('click', () => {
+            if (index2 + visibleCount2 < cards2.length) {
+                index2++;
+            }
+            updateCarousel2();
+        });
+
+        prev2.addEventListener('click', () => {
+            if (index2 > 0) {
+                index2--;
+            }
+            updateCarousel2();
+        });
+
+        window.addEventListener('resize', updateVisibleCount2);
+    </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editIcon = document.querySelector(".edit-icon");
+            const modal = document.getElementById("profile-modal");
+            const closeBtn = document.querySelector(".close");
+    
+            editIcon.addEventListener("click", function () {
+                modal.style.display = "flex"; 
+            });
+    
+            closeBtn.addEventListener("click", function () {
+                modal.style.display = "none";
+            });
+    
+            window.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const postEditIcons = document.querySelectorAll(".favorite-icon");
+            const postModal = document.getElementById("post-modal");
+            const postCloseBtn = postModal.querySelector(".close");
+            
+            postEditIcons.forEach(icon => {
+                icon.addEventListener("click", function () {
+                    // Получаем данные из атрибутов элемента
+                    const postId = this.getAttribute("data-post-id");
+                    const postName = this.getAttribute("data-post-name");
+                    const postDescription = this.getAttribute("data-post-description");
+                    const postType = this.getAttribute("data-post-type");
+
+                    // Заполняем форму модалки
+                    postModal.querySelector("#id_name").value = postName;
+                    postModal.querySelector("#id_description").value = postDescription;
+                    postModal.querySelector("input[name='post_id']").value = postId;
+                    postModal.querySelector("input[name='type']").value = postType;
+
+                    postModal.style.display = "flex";
+                });
+            });
+
+            postCloseBtn.addEventListener("click", function () {
+                postModal.style.display = "none";
+            });
+
+            window.addEventListener("click", function (event) {
+                if (event.target === postModal) {
+                    postModal.style.display = "none";
+                }
+            });
+        });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const postEditIcons = document.querySelectorAll(".favorite-icon");
+        const postModal = document.getElementById("post-modal");
+        const postCloseBtn = postModal.querySelector(".close");
+        
+        postEditIcons.forEach(icon => {
+            icon.addEventListener("click", function () {
+                // Получаем данные из атрибутов элемента
+                const postId = this.getAttribute("data-post-id");
+                const postName = this.getAttribute("data-post-name");
+                const postDescription = this.getAttribute("data-post-description");
+                const postPhoto = this.getAttribute("data-post-photo");
+
+                // Заполняем форму модалки
+                postModal.querySelector("#id_name").value = postName;
+                postModal.querySelector("#id_description").value = postDescription;
+                postModal.querySelector("#id_photo").value = postPhoto;
+                postModal.querySelector("input[name='post_id']").value = postId;
+
+                // Показываем модальное окно
+                postModal.style.display = "flex";
+            });
+        });
+
+        // Закрытие модального окна
+        postCloseBtn.addEventListener("click", function () {
+            postModal.style.display = "none";
+        });
+
+        window.addEventListener("click", function (event) {
+            if (event.target === postModal) {
+                postModal.style.display = "none";
+            }
+        });
+    });
+    </script>
+
+    <script>
+        function deletePost(button) {
+        var postId = button.getAttribute('data-id');
+        if (confirm("Вы уверены, что хотите удалить это объявление?")) {
+            fetch('/delete_post/' + postId + '/', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();  // Перезагрузка страницы после успешного удаления
+                } else {
+                    alert('Ошибка при удалении.');
+                }
+            });
+        }
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>
+</body>
+</html>

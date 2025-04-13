@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чаты | BuFrie</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo_name">
+            <a href="{% url 'home' %}" class="logo">
+                <div>
+                    <i class="fas fa-paw"></i>BuFrie
+                </div>
+                <p class="slogan">Найди себе друга!</p>
+            </a>
+        </div>
+       
+        <nav class="nav1">
+            <ul>
+                <li><a href="{% url 'posts' %}">Объявления</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'create_post' %}" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
+                {% else %}
+                    <li><a href="#" style="color: #a2a2a2;" onclick="alert('Для того чтобы «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i> Разместить объявление </a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <nav class="nav2">
+            <ul>
+                <li>
+                    <a href="{% url 'home' %}" style="color: #a2a2a2;">
+                        <i class="fa-solid fa-arrow-left"></i> На домашнюю страницу
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'cabinet' %}">
+                        <i class="fa-regular fa-user"></i> Личный кабинет
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'favorites' %}">
+                        <i class="fa-regular fa-heart"></i> Избранное 
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Все чаты</h2>
+        <div class="chat-list">
+            {% if chats %}
+                {% for chat in chats %}
+                    <a href="{% url 'chat_view' chat_id=chat.id %}" class="chat-card">
+                        <div class="chat-avatar">
+                            <img src="{% if chat.post.photo %}{{ chat.post.photo.url }}{% else %}{% static 'img/default-post.png' %}{% endif %}" alt="Фото объявления">
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-title">{{ chat.post.name }}</div>
+                            <div class="chat-owner">владелец: {{ chat.post.user.first_name }}</div>
+                            <div class="chat-owner">покупатель: {{ chat.user.first_name }}</div>
+                            <div class="chat-last-message">
+                                {% if chat.last_message_text %}
+                                    {{ chat.last_message_user }}: {{ chat.last_message_text|truncatechars:50 }}
+                                    <div class="chat-time">{{ chat.last_message_time|date:"H:i d.m.Y" }}</div>
+                                {% else %}
+                                    Сообщений пока нет.
+                                {% endif %}
+                            </div>                        
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p>У вас еще нет чатов.</p>
+            {% endif %}
+        </div>
+    </main>
+    
+
+    <footer>
+        <p>&copy; 2025 BuFrie. Все права защищены.</p>
+    </footer>
+</body>
+</html>

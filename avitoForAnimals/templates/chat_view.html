@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат {{ post.user.first_name }} и {{chat.user.first_name}} | BuFrie</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo_name">
+            <a href="{% url 'home' %}" class="logo">
+                <div>
+                    <i class="fas fa-paw"></i>BuFrie
+                </div>
+                <p class="slogan">Найди себе друга!</p>
+            </a>
+        </div>
+       
+        <nav class="nav1">
+            <ul>
+                <li><a href="{% url 'posts' %}">Объявления</a></li>
+            </ul>
+        </nav>
+
+        <nav class="nav2">
+            <ul>
+                <li>
+                    <a href="{% url 'home' %}" style="color: #a2a2a2;">
+                        <i class="fa-solid fa-arrow-left"></i> На домашнюю страницу
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'cabinet' %}">
+                        <i class="fa-regular fa-user"></i> Личный кабинет
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'favorites' %}">
+                        <i class="fa-regular fa-heart"></i> Избранное 
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'all_chats' %}">
+                        <i class="fas fa-envelope"></i> Чаты
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <div class="chat-avatar">
+                        <img src="{% if chat.post.photo %}{{ chat.post.photo.url }}{% else %}{% static 'img/default-post.png' %}{% endif %}" alt="Фото объявления">
+                    </div>
+                    <h2>{{ post.name }}</h2>
+                </div>
+            </div>
+            <div class="messages-container">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="message {% if message.user == user %}right{% else %}left{% endif %}">
+                        <div class="message-user">
+                            <img src="{% if message.user.user_image %}{{ message.user.user_image.url }}{% else %}{% static 'img/default-profile.png' %}{% endif %}" alt="Фото пользователя">
+                        </div>
+                        <div class="message-content">
+                            <p>{{ message.message }}</p>
+                            <small>{{ message.send_time|date:"d-m-Y H:i" }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-messages">Сообщений пока нет...</p>
+                {% endif %}
+            </div>
+            {% if not is_transaction_completed %}
+            <div class="message-input">
+                <form method="POST">
+                    {% csrf_token %}
+                    <textarea name="message" placeholder="Напишите сообщение..." class="message-text" required></textarea>
+                    <button type="submit" class="send-btn">Отправить</button>
+                </form>
+            </div>
+            {% endif %}
+            {% if is_owner and not is_transaction_completed %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="complete_deal" class="deal-btn">Сделка состоялась с пользователем: {{ chat.user.first_name }}</button>
+                </form>
+            {% endif %}
+            {% if is_owner and is_transaction_completed %}
+                <p><strong>Сделка состоялась с пользователем:</strong> {{ chat.user.first_name }}</p>
+                <p>Если пользователь оставит отзыв, он отобразится в личном кабинете</p>
+
+            {% endif %}
+        
+            
+            {% if can_write_review %}
+                {% if existing_review %}
+                    <div class="review">
+                        <p><strong>Ваш отзыв:</strong></p>
+                        <p>{{ existing_review.review_text }}</p>
+                    </div>
+                {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <textarea name="review" placeholder="Напишите отзыв..." class="review-text" required></textarea>
+                        <button type="submit" class="review-btn">Отправить отзыв</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BuFrie. Все права защищены.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Объявления | BuFrie</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/paw-icon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo_name">
+            <a href="{% url 'home' %}" class="logo">
+                <div>
+                    <i class="fas fa-paw"></i>BuFrie
+                </div>
+                <p class="slogan">Найди себе друга!</p>
+            </a>
+        </div>
+       
+        <nav class="nav1">
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'create_post' %}" style="color: #a2a2a2;"><i class="fas fa-plus-circle"></i> Разместить объявление</a></li>
+                {% else %}
+                    <li><a href="#" style="color: #a2a2a2;" onclick="alert('Для того чтобы «Разместить объявление» необходимо авторизоваться!'); return false;"><i class="fas fa-plus-circle"></i> Разместить объявление </a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <nav class="nav2">
+            <ul>
+                <li>
+                    <a href="{% url 'home' %}" style="color: #a2a2a2;">
+                        <i class="fa-solid fa-arrow-left"></i> На домашнюю страницу
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'cabinet' %}">
+                            <i class="fa-regular fa-user"></i> Личный кабинет
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'favorites' %}">
+                            <i class="fa-regular fa-heart"></i> Избранное 
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'all_chats' %}">
+                            <i class="fas fa-envelope"></i> Чаты
+                        </a>
+                    </li>
+
+                {% else %}
+                    <li>
+                        <a href="{% url 'auth' %}">
+                            <i class="fa-solid fa-lock"></i> Вход и регистрация 
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Объявления</h2>
+
+        <section class="search-filter">
+            <form method="GET" class="search" action="{% url 'posts' %}">
+                <input type="text" name="search" placeholder="Поиск по названию..." value="{{ request.GET.search }}">
+                <select name="type">
+                    <option value="">Все типы</option>
+                    {% for post_type in post_types %}
+                        <option value="{{ post_type }}" {% if request.GET.type == post_type %}selected{% endif %}>{{ post_type }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Найти</button>
+            </form>
+        </section>
+       
+        <section class="posts-grid">
+            {% for post in posts %}
+                <div class="post-card">
+                    <h3>{{ post.name }}</h3>
+                    <p><strong>Тип:</strong> {{ post.type }}</p>
+                    <img src="{% if post.photo %}{{ post.photo.url }}{% else %}{% static 'img/default-post.png' %}{% endif %}" alt="Фото объявления">
+                    {% if user.is_authenticated and post.user != user %}
+                        <div class="favorite-icon" onclick="toggleFavorite(event, {{ post.id }})">
+                            <i class="fa-heart {% if post.is_favorite %}fas{% else %}far{% endif %}"></i>
+                        </div>
+                    {% endif %}
+                    {% if post.description %}
+                        <p><strong>Описание:</strong> {{ post.description }}</p>
+                    {% endif %}
+                    {% if post.file %}
+                        <p><a href="{{ post.file.url }}" target="_blank">Скачать файл</a></p>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <p><strong>Автор:</strong> <a href="{% url 'user_cabinet' user_id=post.user.id %}">{{ post.user.first_name}} {{ post.user.last_name}}</a></p>
+                    {% else %}
+                        <p style="color: #ff7a00;"><strong>Авторизуйтесь</strong>, чтобы связаться с владельцем и добавлять карточки в избранное!</p>
+                    {% endif %}
+                    <p><strong>Дата публикации:</strong> {{ post.date }}</p>
+                    {% if user.is_authenticated and post.user != user %}
+                        {% if chat %}
+                            <a href="{% url 'chat_view' chat_id=chat.id %}" class="go_to_chat">Перейти в чат</a>
+                        {% else %}
+                            <a href="{% url 'create_or_get_chat' post_id=post.id user_id=user.id %}" class="go_to_chat">Перейти в чат</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>Нет объявлений...</p>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BuFrie. Все права защищены.</p>
+    </footer>
+
+    <script>
+        function toggleFavorite(event, postId) {
+            var heartIcon = event.target;
+    
+            // Переключение класса для анимации
+            heartIcon.classList.toggle('fas');
+            heartIcon.classList.toggle('far');
+    
+            // AJAX-запрос для обновления избранного в базе данных
+            fetch(`/toggle_favorite/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')  // Не забудьте передать CSRF-токен
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    // Если ошибка, вернуть иконку в исходное состояние
+                    heartIcon.classList.toggle('fas');
+                    heartIcon.classList.toggle('far');
+                } else {
+                    // Обновляем состояние избранного
+                    heartIcon.classList.toggle('fas', data.is_favorite);
+                    heartIcon.classList.toggle('far', !data.is_favorite);
+                }
+            });
+        }
+    
+        // Функция для получения CSRF токена
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    
+</body>
+</html>
